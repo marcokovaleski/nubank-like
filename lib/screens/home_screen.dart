@@ -1,8 +1,7 @@
-// lib/screens/home_screen.dart
 import 'package:flutter/material.dart';
+import '../utils/constants.dart';
+import '../widgets/action_item.dart';
 
-/// Tela Home com saudação, cartão de saldo e ações visuais (Transferir, Pagar, Depositar).
-/// Recebe o argumento 'name' via Navigator (routes). Se não vier, mostra "Usuário".
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -10,242 +9,390 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  // Mock de saldo (apenas visual)
-  double accountBalance = 2548.72;
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+
+  String _userName = 'Usuário';
+  bool _isBalanceVisible = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _animationController = AnimationController(
+      duration: AppConstants.animationDuration,
+      vsync: this,
+    );
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero).animate(
+          CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+        );
+
+    _animationController.forward();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Captura o nome do usuário passado como argumento
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    if (args != null && args.containsKey('name')) {
+      _userName = args['name'] as String;
+    }
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    // obtém argumentos passados pela navegação (Map esperado)
-    final args =
-        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-    final String name = (args != null && args['name'] != null)
-        ? args['name'] as String
-        : 'Usuário';
-
-    const purpleStart = Color(0xFF8A05BE);
-    const purpleEnd = Color(0xFFA96CFF);
-
-    return Scaffold(
-      // AppBar transparente: visual similar a apps bancários
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: false,
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.notifications_none),
-            tooltip: 'Notificações',
-          )
-        ],
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        gradient: AppConstants.backgroundGradient,
       ),
-      extendBodyBehindAppBar: true,
-      body: Stack(
-        children: [
-          // background gradiente no topo
-          Container(
-            height: 260,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                  colors: [purpleStart, purpleEnd],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight),
-              borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
-            ),
-          ),
-          // Conteúdo principal
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Saudação + pequeno subtítulo
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Olá, $name',
-                              style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w700)),
-                          const SizedBox(height: 4),
-                          const Text('Bem-vindo de volta',
-                              style:
-                                  TextStyle(color: Colors.white70, fontSize: 14))
-                        ],
-                      ),
-                      // avatar simples
-                      const CircleAvatar(
-                        backgroundColor: Colors.white24,
-                        child: Icon(Icons.person, color: Colors.white),
-                      )
-                    ],
-                  ),
-                  const SizedBox(height: 18),
-
-                  // Card de saldo (visual)
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(18),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(14),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 12,
-                          offset: Offset(0, 6),
-                        )
-                      ],
-                    ),
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: AnimatedBuilder(
+            animation: _animationController,
+            builder: (context, child) {
+              return FadeTransition(
+                opacity: _fadeAnimation,
+                child: SlideTransition(
+                  position: _slideAnimation,
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('Conta',
-                            style: TextStyle(
-                                fontSize: 13, color: Colors.black54)),
-                        const SizedBox(height: 8),
-                        Text(
-                          'R\$ ${accountBalance.toStringAsFixed(2)}',
-                          style: const TextStyle(
-                              fontSize: 28, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 8),
-                        const Text('Saldo disponível',
-                            style:
-                                TextStyle(fontSize: 13, color: Colors.black45)),
-                      ],
+                      children: [_buildHeader(context), _buildBody(context)],
                     ),
                   ),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
 
-                  const SizedBox(height: 18),
-
-                  // Lista horizontal de ações (apenas UI)
-                  SizedBox(
-                    height: 106,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      children: [
-                        _buildActionTile(icon: Icons.send, label: 'Transferir'),
-                        _buildActionTile(icon: Icons.qr_code, label: 'Pagar'),
-                        _buildActionTile(
-                            icon: Icons.account_balance, label: 'Depositar'),
-                        _buildActionTile(icon: Icons.credit_card, label: 'Cartão'),
-                      ],
-                    ),
+  /// Cabeçalho roxo com saudação e botões
+  Widget _buildHeader(BuildContext context) {
+    return Container(
+      color: AppConstants.primaryPurple,
+      padding: const EdgeInsets.fromLTRB(20, 20, 16, 40),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Linha de botões no topo
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  // Navegação para perfil
+                },
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
-
-                  const SizedBox(height: 16),
-
-                  // Título da seção de movimentos
-                  const Text('Últimas movimentações',
-                      style:
-                          TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
-                  const SizedBox(height: 8),
-
-                  // Lista mock de transações
-                  ListView.separated(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: 5,
-                    separatorBuilder: (_, __) => const Divider(),
-                    itemBuilder: (context, index) {
-                      // Mock de itens
-                      final amounts = [-120.50, -43.20, 324.00, -30.0, -10.5];
-                      final titles = [
-                        'Pagamento - Conta de luz',
-                        'Pix recebido',
-                        'Depósito',
-                        'Transferência',
-                        'Assinatura'
-                      ];
-                      final date = ['22/09', '21/09', '20/09', '19/09', '18/09'];
-                      final amt = amounts[index];
-                      final isCredit = amt >= 0;
-                      return ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor:
-                              isCredit ? Colors.green.shade50 : Colors.red.shade50,
-                          child: Icon(
-                            isCredit ? Icons.arrow_downward : Icons.arrow_upward,
-                            color: isCredit ? Colors.green : Colors.red,
-                          ),
-                        ),
-                        title: Text(titles[index]),
-                        subtitle: Text(date[index]),
-                        trailing: Text(
-                          '${isCredit ? '' : '- '}R\$ ${amt.abs().toStringAsFixed(2)}',
-                          style: TextStyle(
-                              color: isCredit ? Colors.green : Colors.red,
-                              fontWeight: FontWeight.w600),
-                        ),
-                      );
+                  child: Icon(
+                    Icons.person,
+                    color: AppConstants.primaryPurple,
+                    size: 24,
+                  ),
+                ),
+              ),
+              Row(
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      _isBalanceVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      setState(() => _isBalanceVisible = !_isBalanceVisible);
                     },
                   ),
-
-                  const SizedBox(height: 80), // espaço final
+                  IconButton(
+                    icon: const Icon(Icons.help_outline, color: Colors.white),
+                    onPressed: () {
+                      // Central de ajuda
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.mail_outline, color: Colors.white),
+                    onPressed: () {
+                      // Mensagens
+                    },
+                  ),
                 ],
               ),
+            ],
+          ),
+          const SizedBox(height: 40),
+          Text(
+            '${AppConstants.helloMessage}, $_userName',
+            style: AppTextStyles.titleMedium.copyWith(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.w600,
             ),
-          )
-        ],
-      ),
-      // Bottom bar só visual — você pode customizar
-      bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: Colors.purple[800],
-        unselectedItemColor: Colors.black54,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Início'),
-          BottomNavigationBarItem(icon: Icon(Icons.account_balance_wallet), label: 'Carteira'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Ajustes'),
+          ),
         ],
       ),
     );
   }
 
-  // widget helper para os tiles de ação (Transferir, Pagar, ...)
-  Widget _buildActionTile({required IconData icon, required String label}) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 12.0),
+  /// Corpo branco com cartão de saldo, botões de ações e destaques
+  Widget _buildBody(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.only(bottom: 24),
+      color: Colors.white,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Material(
-            elevation: 4,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            child: InkWell(
-              onTap: () {
-                // apenas visual: mostra SnackBar
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('$label — funcionalidade não implementada.')),
-                );
-              },
-              borderRadius: BorderRadius.circular(12),
-              child: Container(
-                width: 80,
-                height: 80,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(icon, size: 26),
-                    const SizedBox(height: 8),
-                    Text(label, textAlign: TextAlign.center, style: const TextStyle(fontSize: 12))
-                  ],
+          // Cartão de saldo posicionado no topo
+          _buildBalanceCard(context),
+          const SizedBox(height: 32),
+          // Botões de ações
+          _buildActionButtons(context),
+          const SizedBox(height: 32),
+          // Divisor
+          const Divider(thickness: 0.5, color: Color(0xFFE0E0E0)),
+          const SizedBox(height: 16),
+          // Seção de fatura atual
+          _buildCreditCardSection(context),
+          const SizedBox(height: 24),
+          // Divisor
+          const Divider(thickness: 0.5, color: Color(0xFFE0E0E0)),
+          const SizedBox(height: 16),
+          // Seção de descoberta
+          _buildDiscoverySection(context),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBalanceCard(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(AppConstants.cardRadius),
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                AppConstants.accountLabel,
+                style: AppTextStyles.bodyLarge.copyWith(
+                  fontWeight: FontWeight.w500,
+                  color: AppConstants.textSecondary,
                 ),
               ),
+              GestureDetector(
+                onTap: () {
+                  // Detalhes da conta
+                },
+                child: Icon(
+                  Icons.keyboard_arrow_down,
+                  color: AppConstants.textSecondary,
+                  size: 20,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Text(
+                _isBalanceVisible ? 'R\$ 1.500,00' : '••••••',
+                style: AppTextStyles.balanceText.copyWith(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(width: 12),
+              if (_isBalanceVisible)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppConstants.primaryPurple.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    'Saldo disponível',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppConstants.primaryPurple,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButtons(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        child: Row(
+          children: [
+            const SizedBox(width: 20),
+            ...HomeActions.actions.map(
+              (action) => Padding(
+                padding: const EdgeInsets.only(right: 20),
+                child: ActionItem(
+                  icon: action['icon'] as IconData,
+                  label: action['label'] as String,
+                ),
+              ),
+            ),
+            const SizedBox(width: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCreditCardSection(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Fatura atual',
+            style: AppTextStyles.bodyLarge.copyWith(
+              fontWeight: FontWeight.w500,
+              color: AppConstants.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            _isBalanceVisible ? 'R\$ 1.027,51' : '••••••',
+            style: AppTextStyles.balanceText.copyWith(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            _isBalanceVisible ? 'Limite disponível de R\$ 466,49' : '••••••',
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppConstants.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          GestureDetector(
+            onTap: () {
+              // Navegação para meus cartões
+            },
+            child: Row(
+              children: [
+                Icon(
+                  Icons.credit_card,
+                  color: AppConstants.primaryPurple,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Meus cartões',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppConstants.primaryPurple,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const Spacer(),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  color: AppConstants.primaryPurple,
+                  size: 16,
+                ),
+              ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildDiscoverySection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          child: Text(
+            AppConstants.discoverMore,
+            style: AppTextStyles.titleMedium.copyWith(
+              fontWeight: FontWeight.w600,
+              fontSize: 18,
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
+          child: Row(
+            children: [
+              const SizedBox(width: 20),
+              ...DiscoveryCards.cards.map(
+                (card) => DiscoveryCard(
+                  title: card['title']!,
+                  content: card['content']!,
+                  buttonText: card['buttonText']!,
+                ),
+              ),
+              const SizedBox(width: 20),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
