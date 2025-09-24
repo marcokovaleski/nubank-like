@@ -1,5 +1,6 @@
 // lib/screens/login_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../utils/constants.dart';
 
 /// Tela de login com design aprimorado e melhor UX.
@@ -144,14 +145,11 @@ class _LoginScreenState extends State<LoginScreen>
               ),
             ],
           ),
-          child: const Center(
-            child: Text(
-              'nu',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
+          child: Center(
+            child: SvgPicture.asset(
+              'assets/icons/nubank-icon.svg',
+              width: 24,
+              height: 24,
             ),
           ),
         ),

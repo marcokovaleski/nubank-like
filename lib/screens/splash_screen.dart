@@ -1,6 +1,7 @@
 // lib/screens/splash_screen.dart
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../utils/constants.dart';
 
 /// Splash screen com animações e design refinado.
@@ -127,15 +128,11 @@ class _SplashScreenState extends State<SplashScreen>
                               ),
                             ],
                           ),
-                          child: const Center(
-                            child: Text(
-                              'nu',
-                              style: TextStyle(
-                                fontSize: 52,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 2.0,
-                              ),
+                          child: Center(
+                            child: SvgPicture.asset(
+                              'assets/icons/nubank-icon.svg',
+                              width: 60,
+                              height: 60,
                             ),
                           ),
                         ),

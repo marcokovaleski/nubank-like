@@ -198,75 +198,34 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildBalanceCard(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(AppConstants.cardRadius),
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                AppConstants.accountLabel,
-                style: AppTextStyles.bodyLarge.copyWith(
-                  fontWeight: FontWeight.w500,
+                'Saldo em conta:',
+                style: AppTextStyles.bodyMedium.copyWith(
                   color: AppConstants.textSecondary,
                 ),
               ),
-              GestureDetector(
-                onTap: () {
-                  // Detalhes da conta
-                },
-                child: Icon(
-                  Icons.keyboard_arrow_down,
-                  color: AppConstants.textSecondary,
-                  size: 20,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
+              const SizedBox(height: 4),
               Text(
-                _isBalanceVisible ? 'R\$ 1.500,00' : '••••••',
+                _isBalanceVisible ? 'R\$ 3,06' : '••••••',
                 style: AppTextStyles.balanceText.copyWith(
-                  fontSize: 28,
+                  fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(width: 12),
-              if (_isBalanceVisible)
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppConstants.primaryPurple.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    'Saldo disponível',
-                    style: AppTextStyles.bodySmall.copyWith(
-                      color: AppConstants.primaryPurple,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
             ],
+          ),
+          Icon(
+            Icons.arrow_forward_ios,
+            color: AppConstants.textSecondary,
+            size: 16,
           ),
         ],
       ),
@@ -304,6 +263,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Cartão de crédito',
+                style: AppTextStyles.bodyLarge.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppConstants.textSecondary,
+                ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios,
+                color: AppConstants.textSecondary,
+                size: 16,
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
           Text(
             'Fatura atual',
             style: AppTextStyles.bodyLarge.copyWith(
@@ -327,10 +304,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ),
           ),
           const SizedBox(height: 16),
-          GestureDetector(
-            onTap: () {
-              // Navegação para meus cartões
-            },
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.circular(8),
+            ),
             child: Row(
               children: [
                 Icon(
