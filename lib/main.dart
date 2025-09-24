@@ -22,7 +22,7 @@ class NubankUiCloneApp extends StatelessWidget {
       theme: _buildTheme(),
       initialRoute: '/',
       routes: {
-        '/': (context) => const SplashScreen(),
+        '/': (context) => SplashScreen(),
         '/login': (context) => const LoginScreen(),
         '/home': (context) => const HomeScreen(),
       },
