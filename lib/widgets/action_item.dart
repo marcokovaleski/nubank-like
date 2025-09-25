@@ -1,57 +1,47 @@
 import 'package:flutter/material.dart';
 import '../utils/constants.dart';
+import '../utils/app_styles.dart';
 
-/// Widget reutilizável para botões de ação na tela home
+/// Widget para botões de ação na tela home
+///
+/// Exibe um ícone circular com label abaixo
 class ActionItem extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback? onTap;
-  final Color? backgroundColor;
-  final Color? iconColor;
 
-  const ActionItem({
-    super.key,
-    required this.icon,
-    required this.label,
-    this.onTap,
-    this.backgroundColor,
-    this.iconColor,
-  });
+  const ActionItem({required this.icon, required this.label, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         children: [
+          // Ícone circular
           Container(
-            width: 60,
-            height: 60,
+            width: AppConstants.actionItemSize,
+            height: AppConstants.actionItemSize,
             decoration: BoxDecoration(
-              color: backgroundColor ?? AppConstants.backgroundColor,
+              color: AppConstants.backgroundColor,
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
-                  blurRadius: 6,
-                  offset: const Offset(0, 3),
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 4,
+                  offset: Offset(0, 2),
                 ),
               ],
             ),
-            child: Icon(
-              icon,
-              color: iconColor ?? AppConstants.textPrimary,
-              size: 26,
-            ),
+            child: Icon(icon, color: Colors.black, size: AppConstants.iconSize),
           ),
-          const SizedBox(height: 10),
+
+          SizedBox(height: 8),
+
+          // Label do botão
           Text(
             label,
-            style: AppTextStyles.actionLabel.copyWith(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
+            style: AppTextStyles.actionLabel,
             textAlign: TextAlign.center,
           ),
         ],
@@ -60,73 +50,65 @@ class ActionItem extends StatelessWidget {
   }
 }
 
-/// Widget para card de descoberta
+/// Widget para cards de descoberta
+///
+/// Exibe um card com título, subtítulo e botão de ação
 class DiscoveryCard extends StatelessWidget {
   final String title;
-  final String content;
-  final String buttonText;
+  final String subtitle;
   final VoidCallback? onTap;
 
   const DiscoveryCard({
-    super.key,
     required this.title,
-    required this.content,
-    required this.buttonText,
+    required this.subtitle,
     this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 220,
-      margin: const EdgeInsets.only(right: 14),
-      padding: const EdgeInsets.all(16),
+      width: AppConstants.discoveryCardWidth,
+      padding: EdgeInsets.all(AppConstants.defaultPadding),
       decoration: BoxDecoration(
+        color: AppConstants.cardBackground,
         borderRadius: BorderRadius.circular(AppConstants.cardRadius),
-        color: AppConstants.backgroundColor,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
             blurRadius: 8,
-            offset: const Offset(0, 2),
+            offset: Offset(0, 2),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Título do card
           Text(
             title,
             style: AppTextStyles.bodyLarge.copyWith(
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 10),
-          Text(content, style: AppTextStyles.bodyMedium),
-          const SizedBox(height: 12),
+
+          SizedBox(height: 8),
+
+          // Subtítulo do card
+          Text(subtitle, style: AppTextStyles.bodyMedium),
+
+          SizedBox(height: 16),
+
+          // Botão de ação
           Container(
             width: double.infinity,
-            height: 36,
+            height: 40,
             decoration: BoxDecoration(
               color: AppConstants.primaryPurple,
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppConstants.buttonRadius),
             ),
             child: TextButton(
               onPressed: onTap,
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: Text(
-                buttonText,
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+              child: Text('Conhecer', style: AppTextStyles.buttonText),
             ),
           ),
         ],

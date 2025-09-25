@@ -1,90 +1,65 @@
-// lib/screens/login_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../utils/constants.dart';
+import '../utils/app_styles.dart';
 
-/// Tela de login com design aprimorado e melhor UX.
-/// Campos para "CPF ou e-mail" e "Senha" com validação e navegação para Home.
+/// Tela de Login - Interface para autenticação do usuário
+///
+/// Esta tela permite ao usuário inserir CPF/e-mail e senha
+/// para acessar a tela principal do aplicativo
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
-
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen>
-    with TickerProviderStateMixin {
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _userFieldController = TextEditingController();
+class _LoginScreenState extends State<LoginScreen> {
+  // Controladores para os campos de texto
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  // Chave para validação do formulário
+  final _formKey = GlobalKey<FormState>();
+
+  // Estado para controlar visibilidade da senha
   bool _hidePassword = true;
+
+  // Estado para controlar carregamento do botão
   bool _isLoading = false;
-
-  late AnimationController _animationController;
-  late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _animationController = AnimationController(
-      duration: AppConstants.animationDuration,
-      vsync: this,
-    );
-
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
-    );
-
-    _slideAnimation =
-        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
-          CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
-        );
-
-    _animationController.forward();
-  }
 
   @override
   void dispose() {
-    _userFieldController.dispose();
+    // Limpa os controladores para evitar vazamentos de memória
+    _emailController.dispose();
     _passwordController.dispose();
-    _animationController.dispose();
     super.dispose();
   }
 
-  String _deriveNameFromInput(String input) {
-    if (input.contains('@')) {
-      final beforeAt = input.split('@')[0];
-      final parts = beforeAt
-          .split(RegExp(r'[._\-]'))
-          .where((s) => s.isNotEmpty);
-      return parts
-          .map(
-            (p) => p.isEmpty
-                ? p
-                : '${p[0].toUpperCase()}${p.substring(1).toLowerCase()}',
-          )
-          .join(' ');
+  /// Extrai o nome do usuário a partir do e-mail inserido
+  String _getUserNameFromEmail(String email) {
+    if (email.contains('@')) {
+      // Pega a parte antes do @ e formata como nome
+      String name = email.split('@')[0];
+      return name.replaceAll('.', ' ').replaceAll('_', ' ');
     }
     return 'Usuário';
   }
 
-  void _onLoginPressed() async {
-    if (_formKey.currentState?.validate() ?? false) {
+  /// Processa o login quando o botão é pressionado
+  ///
+  /// Este método valida os campos, simula uma requisição de login
+  /// e navega para a tela principal se tudo estiver correto.
+  void _handleLogin() async {
+    // Valida o formulário antes de prosseguir
+    if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
 
-      // Simula um delay de login
-      await Future.delayed(const Duration(milliseconds: 1500));
+      // Simula delay de login (como se fosse uma requisição real)
+      await Future.delayed(Duration(seconds: 1));
 
-      if (!mounted) return;
-
-      final raw = _userFieldController.text.trim();
-      final displayName = _deriveNameFromInput(raw);
-
-      Navigator.of(
-        context,
-      ).pushReplacementNamed('/home', arguments: {'name': displayName});
+      // Verifica se o widget ainda está montado antes de navegar
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/home');
+      }
     }
   }
 
@@ -93,57 +68,37 @@ class _LoginScreenState extends State<LoginScreen>
     return Scaffold(
       backgroundColor: AppConstants.backgroundColor,
       body: SafeArea(
-        child: AnimatedBuilder(
-          animation: _animationController,
-          builder: (context, child) {
-            return FadeTransition(
-              opacity: _fadeAnimation,
-              child: SlideTransition(
-                position: _slideAnimation,
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppConstants.defaultPadding,
-                    vertical: 32,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildHeader(),
-                      const SizedBox(height: 32),
-                      _buildTitle(),
-                      const SizedBox(height: 8),
-                      _buildSubtitle(),
-                      const SizedBox(height: 32),
-                      _buildLoginForm(),
-                      const SizedBox(height: 24),
-                      _buildFooter(),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
+        child: Padding(
+          padding: EdgeInsets.all(AppConstants.defaultPadding),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeader(),
+              SizedBox(height: 40),
+              _buildTitle(),
+              SizedBox(height: 10),
+              _buildSubtitle(),
+              SizedBox(height: 40),
+              _buildLoginForm(),
+              SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );
   }
 
+  /// Cabeçalho com logo e nome do app
   Widget _buildHeader() {
     return Row(
       children: [
+        // Logo do Nubank
         Container(
           width: 40,
           height: 40,
           decoration: BoxDecoration(
             color: AppConstants.primaryPurple,
             shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: AppConstants.primaryPurple.withOpacity(0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
           ),
           child: Center(
             child: SvgPicture.asset(
@@ -153,7 +108,7 @@ class _LoginScreenState extends State<LoginScreen>
             ),
           ),
         ),
-        const SizedBox(width: 12),
+        SizedBox(width: 12),
         Text(
           AppConstants.appName,
           style: AppTextStyles.titleMedium.copyWith(
@@ -164,37 +119,36 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
+  /// Título da tela
   Widget _buildTitle() {
-    return Text(AppConstants.loginTitle, style: AppTextStyles.titleLarge);
+    return Text(AppConstants.welcomeMessage, style: AppTextStyles.titleLarge);
   }
 
+  /// Subtítulo da tela
   Widget _buildSubtitle() {
-    return Text(AppConstants.loginSubtitle, style: AppTextStyles.bodyMedium);
+    return Text(
+      AppConstants.loginSubtitle,
+      style: AppTextStyles.bodyLarge.copyWith(color: Colors.grey[600]),
+    );
   }
 
+  /// Formulário de login
   Widget _buildLoginForm() {
     return Card(
-      elevation: 8,
-      shadowColor: Colors.black.withOpacity(0.1),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppConstants.cardRadius),
-      ),
-      child: Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(AppConstants.cardRadius),
-          color: AppConstants.cardBackground,
-        ),
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: EdgeInsets.all(20),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
               _buildEmailField(),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               _buildPasswordField(),
-              const SizedBox(height: 24),
+              SizedBox(height: 24),
               _buildLoginButton(),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               _buildForgotPasswordButton(),
             ],
           ),
@@ -203,152 +157,104 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
+  /// Campo de e-mail/CPF
   Widget _buildEmailField() {
     return TextFormField(
-      controller: _userFieldController,
+      controller: _emailController,
       keyboardType: TextInputType.emailAddress,
-      style: AppTextStyles.bodyLarge,
       decoration: InputDecoration(
         labelText: 'CPF ou e-mail',
-        labelStyle: AppTextStyles.bodyMedium,
         prefixIcon: Icon(
           Icons.person_outline,
           color: AppConstants.primaryPurple,
         ),
-        filled: true,
-        fillColor: AppConstants.backgroundColor,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppConstants.buttonRadius),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppConstants.buttonRadius),
-          borderSide: BorderSide.none,
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppConstants.buttonRadius),
-          borderSide: BorderSide(color: AppConstants.primaryPurple, width: 2),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppConstants.buttonRadius),
-          borderSide: const BorderSide(color: Colors.red, width: 1),
-        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
       ),
-      validator: (v) {
-        if (v == null || v.trim().isEmpty) {
-          return 'Informe CPF ou e-mail';
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return AppConstants.emailRequiredMessage;
         }
         return null;
       },
     );
   }
 
+  /// Campo de senha
   Widget _buildPasswordField() {
     return TextFormField(
       controller: _passwordController,
       obscureText: _hidePassword,
-      style: AppTextStyles.bodyLarge,
       decoration: InputDecoration(
         labelText: 'Senha',
-        labelStyle: AppTextStyles.bodyMedium,
         prefixIcon: Icon(Icons.lock_outline, color: AppConstants.primaryPurple),
         suffixIcon: IconButton(
           icon: Icon(
             _hidePassword ? Icons.visibility_off : Icons.visibility,
             color: AppConstants.primaryPurple,
           ),
-          onPressed: () => setState(() => _hidePassword = !_hidePassword),
+          onPressed: () {
+            setState(() {
+              _hidePassword = !_hidePassword;
+            });
+          },
         ),
-        filled: true,
-        fillColor: AppConstants.backgroundColor,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppConstants.buttonRadius),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppConstants.buttonRadius),
-          borderSide: BorderSide.none,
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppConstants.buttonRadius),
-          borderSide: BorderSide(color: AppConstants.primaryPurple, width: 2),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppConstants.buttonRadius),
-          borderSide: const BorderSide(color: Colors.red, width: 1),
-        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
       ),
-      validator: (v) {
-        if (v == null || v.isEmpty) {
-          return 'Informe a senha';
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return AppConstants.passwordRequiredMessage;
         }
-        if (v.length < 4) {
-          return 'Senha muito curta';
+        if (value.length < AppConstants.minPasswordLength) {
+          return AppConstants.passwordTooShortMessage;
         }
         return null;
       },
     );
   }
 
+  /// Botão de login
   Widget _buildLoginButton() {
     return SizedBox(
       width: double.infinity,
       height: 50,
       child: ElevatedButton(
-        onPressed: _isLoading ? null : _onLoginPressed,
+        onPressed: _isLoading ? null : _handleLogin,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppConstants.primaryPurple,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppConstants.buttonRadius),
-          ),
-          elevation: 4,
-          shadowColor: AppConstants.primaryPurple.withOpacity(0.3),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
         child: _isLoading
-            ? const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            ? CircularProgressIndicator(color: Colors.white)
+            : Text(
+                'Entrar',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
-              )
-            : Text('Entrar', style: AppTextStyles.buttonText),
+              ),
       ),
     );
   }
 
+  /// Botão "Esqueci minha senha"
   Widget _buildForgotPasswordButton() {
     return TextButton(
       onPressed: () {
+        // Mostra uma mensagem informativa
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text(
-              'Funcionalidade de recuperação de senha em desenvolvimento',
-            ),
+            content: Text('Funcionalidade em desenvolvimento'),
             backgroundColor: AppConstants.primaryPurple,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppConstants.buttonRadius),
-            ),
           ),
         );
       },
-      style: TextButton.styleFrom(foregroundColor: AppConstants.primaryPurple),
       child: Text(
         'Esqueci minha senha',
-        style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w500),
-      ),
-    );
-  }
-
-  Widget _buildFooter() {
-    return Center(
-      child: Text(
-        'Esta é uma réplica de interface — sem integração real.',
-        style: AppTextStyles.bodySmall.copyWith(color: AppConstants.textLight),
-        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: AppConstants.primaryPurple,
+          fontWeight: FontWeight.w500,
+        ),
       ),
     );
   }

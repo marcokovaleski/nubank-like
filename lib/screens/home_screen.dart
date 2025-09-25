@@ -1,47 +1,32 @@
 import 'package:flutter/material.dart';
 import '../utils/constants.dart';
+import '../utils/app_styles.dart';
 import '../widgets/action_item.dart';
 
+/// Tela Principal - Interface principal do aplicativo Nubank
+///
+/// Esta tela exibe:
+/// - Saudação do usuário
+/// - Saldo da conta
+/// - Botões de ação (Pix, Transferir, etc.)
+/// - Seção de cartão de crédito
+/// - Cards de descoberta
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
-
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
-
+class _HomeScreenState extends State<HomeScreen> {
+  // Nome do usuário (pode ser passado como argumento)
   String _userName = 'Usuário';
+
+  // Controla se o saldo está visível ou oculto
   bool _isBalanceVisible = true;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _animationController = AnimationController(
-      duration: AppConstants.animationDuration,
-      vsync: this,
-    );
-
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
-    );
-
-    _slideAnimation =
-        Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero).animate(
-          CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
-        );
-
-    _animationController.forward();
-  }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Captura o nome do usuário passado como argumento
+    // Captura o nome do usuário se foi passado como argumento
     final args =
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     if (args != null && args.containsKey('name')) {
@@ -50,37 +35,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: const BoxDecoration(
-        gradient: AppConstants.backgroundGradient,
-      ),
-      child: SafeArea(
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          body: AnimatedBuilder(
-            animation: _animationController,
-            builder: (context, child) {
-              return FadeTransition(
-                opacity: _fadeAnimation,
-                child: SlideTransition(
-                  position: _slideAnimation,
-                  child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [_buildHeader(context), _buildBody(context)],
-                    ),
-                  ),
-                ),
-              );
-            },
+    return Scaffold(
+      backgroundColor: AppConstants.backgroundColor,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeader(),
+              _buildBalanceSection(),
+              _buildActionButtons(),
+              _buildCreditCardSection(),
+              _buildDiscoverySection(),
+            ],
           ),
         ),
       ),
@@ -88,42 +56,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   /// Cabeçalho roxo com saudação e botões
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader() {
     return Container(
       color: AppConstants.primaryPurple,
-      padding: const EdgeInsets.fromLTRB(20, 20, 16, 40),
+      padding: EdgeInsets.all(AppConstants.defaultPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Linha de botões no topo
+          // Botões do cabeçalho
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              GestureDetector(
-                onTap: () {
-                  // Navegação para perfil
-                },
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Icon(
-                    Icons.person,
-                    color: AppConstants.primaryPurple,
-                    size: 24,
-                  ),
-                ),
+              // Avatar do usuário
+              CircleAvatar(
+                backgroundColor: Colors.white,
+                child: Icon(Icons.person, color: AppConstants.primaryPurple),
               ),
+
+              // Botões de ação
               Row(
                 children: [
                   IconButton(
@@ -134,72 +84,43 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       color: Colors.white,
                     ),
                     onPressed: () {
-                      setState(() => _isBalanceVisible = !_isBalanceVisible);
+                      setState(() {
+                        _isBalanceVisible = !_isBalanceVisible;
+                      });
                     },
                   ),
                   IconButton(
-                    icon: const Icon(Icons.help_outline, color: Colors.white),
-                    onPressed: () {
-                      // Central de ajuda
-                    },
+                    icon: Icon(Icons.help_outline, color: Colors.white),
+                    onPressed: () {},
                   ),
                   IconButton(
-                    icon: const Icon(Icons.mail_outline, color: Colors.white),
-                    onPressed: () {
-                      // Mensagens
-                    },
+                    icon: Icon(Icons.security, color: Colors.white),
+                    onPressed: () {},
                   ),
                 ],
               ),
             ],
           ),
-          const SizedBox(height: 40),
+
+          SizedBox(height: 20),
+
+          // Saudação
           Text(
-            '${AppConstants.helloMessage}, $_userName',
-            style: AppTextStyles.titleMedium.copyWith(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.w600,
-            ),
+            'Olá, $_userName',
+            style: AppTextStyles.titleSmall.copyWith(color: Colors.white),
           ),
         ],
       ),
     );
   }
 
-  /// Corpo branco com cartão de saldo, botões de ações e destaques
-  Widget _buildBody(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.only(bottom: 24),
-      color: Colors.white,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Cartão de saldo posicionado no topo
-          _buildBalanceCard(context),
-          const SizedBox(height: 32),
-          // Botões de ações
-          _buildActionButtons(context),
-          const SizedBox(height: 32),
-          // Divisor
-          const Divider(thickness: 0.5, color: Color(0xFFE0E0E0)),
-          const SizedBox(height: 16),
-          // Seção de fatura atual
-          _buildCreditCardSection(context),
-          const SizedBox(height: 24),
-          // Divisor
-          const Divider(thickness: 0.5, color: Color(0xFFE0E0E0)),
-          const SizedBox(height: 16),
-          // Seção de descoberta
-          _buildDiscoverySection(context),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBalanceCard(BuildContext context) {
+  /// Seção de saldo da conta
+  Widget _buildBalanceSection() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      padding: EdgeInsets.symmetric(
+        horizontal: AppConstants.defaultPadding,
+        vertical: 16,
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -208,58 +129,74 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             children: [
               Text(
                 'Saldo em conta:',
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppConstants.textSecondary,
-                ),
+                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
               ),
-              const SizedBox(height: 4),
+              SizedBox(height: 4),
               Text(
                 _isBalanceVisible ? 'R\$ 3,06' : '••••••',
-                style: AppTextStyles.balanceText.copyWith(
+                style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
+                  color: Colors.black87,
                 ),
               ),
             ],
           ),
-          Icon(
-            Icons.arrow_forward_ios,
-            color: AppConstants.textSecondary,
-            size: 16,
-          ),
+          Icon(Icons.arrow_forward_ios, color: Colors.grey[400], size: 16),
         ],
       ),
     );
   }
 
-  Widget _buildActionButtons(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+  /// Botões de ação (Pix, Transferir, etc.)
+  Widget _buildActionButtons() {
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: AppConstants.defaultPadding,
+        vertical: 16,
+      ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        physics: const BouncingScrollPhysics(),
         child: Row(
           children: [
-            const SizedBox(width: 20),
-            ...HomeActions.actions.map(
-              (action) => Padding(
-                padding: const EdgeInsets.only(right: 20),
-                child: ActionItem(
-                  icon: action['icon'] as IconData,
-                  label: action['label'] as String,
-                ),
-              ),
+            ActionItem(
+              icon: Icons.pix,
+              label: 'Área Pix Transferir',
+              onTap: () {},
             ),
-            const SizedBox(width: 20),
+            SizedBox(width: 20),
+            ActionItem(icon: Icons.payment, label: 'Pagar', onTap: () {}),
+            SizedBox(width: 20),
+            ActionItem(
+              icon: Icons.monetization_on,
+              label: 'Pegar emprestado',
+              onTap: () {},
+            ),
+            SizedBox(width: 20),
+            ActionItem(
+              icon: Icons.savings,
+              label: 'Caixinha Turbo',
+              onTap: () {},
+            ),
+            SizedBox(width: 20),
+            ActionItem(
+              icon: Icons.phone_android,
+              label: 'Recarga de celular',
+              onTap: () {},
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildCreditCardSection(BuildContext context) {
+  /// Seção do cartão de crédito
+  Widget _buildCreditCardSection() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: EdgeInsets.symmetric(
+        horizontal: AppConstants.defaultPadding,
+        vertical: 20,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -268,45 +205,42 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             children: [
               Text(
                 'Cartão de crédito',
-                style: AppTextStyles.bodyLarge.copyWith(
+                style: TextStyle(
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: AppConstants.textSecondary,
+                  color: Colors.grey[600],
                 ),
               ),
-              Icon(
-                Icons.arrow_forward_ios,
-                color: AppConstants.textSecondary,
-                size: 16,
-              ),
+              Icon(Icons.arrow_forward_ios, color: Colors.grey[400], size: 16),
             ],
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           Text(
             'Fatura atual',
-            style: AppTextStyles.bodyLarge.copyWith(
+            style: TextStyle(
+              fontSize: 16,
               fontWeight: FontWeight.w500,
-              color: AppConstants.textSecondary,
+              color: Colors.grey[600],
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           Text(
             _isBalanceVisible ? 'R\$ 1.027,51' : '••••••',
-            style: AppTextStyles.balanceText.copyWith(
+            style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
+              color: Colors.black87,
             ),
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           Text(
             _isBalanceVisible ? 'Limite disponível de R\$ 466,49' : '••••••',
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: AppConstants.textSecondary,
-            ),
+            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
             decoration: BoxDecoration(
               color: Colors.grey[200],
               borderRadius: BorderRadius.circular(8),
@@ -318,19 +252,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   color: AppConstants.primaryPurple,
                   size: 20,
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 Text(
                   'Meus cartões',
-                  style: AppTextStyles.bodyMedium.copyWith(
+                  style: TextStyle(
                     color: AppConstants.primaryPurple,
                     fontWeight: FontWeight.w500,
                   ),
-                ),
-                const Spacer(),
-                Icon(
-                  Icons.arrow_forward_ios,
-                  color: AppConstants.primaryPurple,
-                  size: 16,
                 ),
               ],
             ),
@@ -340,39 +268,33 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildDiscoverySection(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-          child: Text(
-            AppConstants.discoverMore,
-            style: AppTextStyles.titleMedium.copyWith(
-              fontWeight: FontWeight.w600,
-              fontSize: 18,
+  /// Seção de descoberta
+  Widget _buildDiscoverySection() {
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: AppConstants.defaultPadding,
+        vertical: 16,
+      ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            DiscoveryCard(
+              title: 'Seguro Vida',
+              subtitle:
+                  'Cuide de quem você ama de um jeito simples e que cabe no seu bolso',
+              onTap: () {},
             ),
-          ),
+            SizedBox(width: 16),
+            DiscoveryCard(
+              title: 'Área de Seguros do Nu',
+              subtitle:
+                  'Toda proteção para você e para quem você ama num só lugar',
+              onTap: () {},
+            ),
+          ],
         ),
-        const SizedBox(height: 16),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
-          child: Row(
-            children: [
-              const SizedBox(width: 20),
-              ...DiscoveryCards.cards.map(
-                (card) => DiscoveryCard(
-                  title: card['title']!,
-                  content: card['content']!,
-                  buttonText: card['buttonText']!,
-                ),
-              ),
-              const SizedBox(width: 20),
-            ],
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
