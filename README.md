@@ -371,20 +371,8 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 ## 👨‍💻 Autor
 
-**Desenvolvido com ❤️ para a comunidade Flutter**
-
-- **GitHub**: [@seu-usuario](https://github.com/seu-usuario)
-- **LinkedIn**: [Seu Perfil](https://linkedin.com/in/seu-perfil)
-- **Email**: seu.email@exemplo.com
-
-## 🙏 Agradecimentos
-
-- **Nubank** pela inspiração no design
-- **Flutter Team** pelo framework incrível
-- **Comunidade Flutter** pelo suporte constante
-- **Contribuidores** que ajudaram a melhorar o projeto
-
----
+- **GitHub**: [@marcokovaleski](https://github.com/marcokovaleski)
+- **LinkedIn**: [marco-aurelio-kovaleski](https://www.linkedin.com/in/marco-aurelio-kovaleski/)
 
 <div align="center">
 
