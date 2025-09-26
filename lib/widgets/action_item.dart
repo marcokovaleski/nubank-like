@@ -10,7 +10,12 @@ class ActionItem extends StatelessWidget {
   final String label;
   final VoidCallback? onTap;
 
-  const ActionItem({required this.icon, required this.label, this.onTap});
+  const ActionItem({
+    super.key,
+    required this.icon,
+    required this.label,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +32,7 @@ class ActionItem extends StatelessWidget {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 4,
                   offset: Offset(0, 2),
                 ),
@@ -59,6 +64,7 @@ class DiscoveryCard extends StatelessWidget {
   final VoidCallback? onTap;
 
   const DiscoveryCard({
+    super.key,
     required this.title,
     required this.subtitle,
     this.onTap,
@@ -74,7 +80,7 @@ class DiscoveryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppConstants.cardRadius),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: Offset(0, 2),
           ),

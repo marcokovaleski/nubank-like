@@ -8,11 +8,13 @@ import '../utils/app_styles.dart';
 /// Esta tela permite ao usuário inserir CPF/e-mail e senha
 /// para acessar a tela principal do aplicativo
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  LoginScreenState createState() => LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class LoginScreenState extends State<LoginScreen> {
   // Controladores para os campos de texto
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -26,24 +28,6 @@ class _LoginScreenState extends State<LoginScreen> {
   // Estado para controlar carregamento do botão
   bool _isLoading = false;
 
-  @override
-  void dispose() {
-    // Limpa os controladores para evitar vazamentos de memória
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-  /// Extrai o nome do usuário a partir do e-mail inserido
-  String _getUserNameFromEmail(String email) {
-    if (email.contains('@')) {
-      // Pega a parte antes do @ e formata como nome
-      String name = email.split('@')[0];
-      return name.replaceAll('.', ' ').replaceAll('_', ' ');
-    }
-    return 'Usuário';
-  }
-
   /// Processa o login quando o botão é pressionado
   ///
   /// Este método valida os campos, simula uma requisição de login
@@ -52,9 +36,6 @@ class _LoginScreenState extends State<LoginScreen> {
     // Valida o formulário antes de prosseguir
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
-
-      // Simula delay de login (como se fosse uma requisição real)
-      await Future.delayed(Duration(seconds: 1));
 
       // Verifica se o widget ainda está montado antes de navegar
       if (mounted) {
@@ -239,22 +220,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   /// Botão "Esqueci minha senha"
   Widget _buildForgotPasswordButton() {
-    return TextButton(
-      onPressed: () {
-        // Mostra uma mensagem informativa
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Funcionalidade em desenvolvimento'),
-            backgroundColor: AppConstants.primaryPurple,
-          ),
-        );
-      },
-      child: Text(
-        'Esqueci minha senha',
-        style: TextStyle(
-          color: AppConstants.primaryPurple,
-          fontWeight: FontWeight.w500,
-        ),
+    return Text(
+      'Esqueci minha senha',
+      style: TextStyle(
+        color: AppConstants.primaryPurple,
+        fontWeight: FontWeight.w500,
       ),
     );
   }

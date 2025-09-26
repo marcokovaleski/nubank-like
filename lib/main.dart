@@ -19,6 +19,8 @@ void main() {
 /// - Sistema de navegação entre telas
 /// - Configurações globais do MaterialApp
 class NubankApp extends StatelessWidget {
+  const NubankApp({super.key});
+
   // Nome da aplicação
   static const String appTitle = 'Nubank Clone';
 

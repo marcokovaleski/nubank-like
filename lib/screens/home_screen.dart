@@ -12,27 +12,15 @@ import '../widgets/action_item.dart';
 /// - Seção de cartão de crédito
 /// - Cards de descoberta
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  HomeScreenState createState() => HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  // Nome do usuário (pode ser passado como argumento)
-  String _userName = 'Usuário';
-
+class HomeScreenState extends State<HomeScreen> {
   // Controla se o saldo está visível ou oculto
   bool _isBalanceVisible = true;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // Captura o nome do usuário se foi passado como argumento
-    final args =
-        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-    if (args != null && args.containsKey('name')) {
-      _userName = args['name'] as String;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -106,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
           // Saudação
           Text(
-            'Olá, $_userName',
+            'Olá, Usuário',
             style: AppTextStyles.titleSmall.copyWith(color: Colors.white),
           ),
         ],
@@ -275,25 +263,39 @@ class _HomeScreenState extends State<HomeScreen> {
         horizontal: AppConstants.defaultPadding,
         vertical: 16,
       ),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: [
-            DiscoveryCard(
-              title: 'Seguro Vida',
-              subtitle:
-                  'Cuide de quem você ama de um jeito simples e que cabe no seu bolso',
-              onTap: () {},
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Descubra mais',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey[600],
             ),
-            SizedBox(width: 16),
-            DiscoveryCard(
-              title: 'Área de Seguros do Nu',
-              subtitle:
-                  'Toda proteção para você e para quem você ama num só lugar',
-              onTap: () {},
+          ),
+          SizedBox(height: 8),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                DiscoveryCard(
+                  title: 'Seguro Vida',
+                  subtitle:
+                      'Cuide de quem você ama de um jeito simples e que cabe no seu bolso',
+                  onTap: () {},
+                ),
+                SizedBox(width: 16),
+                DiscoveryCard(
+                  title: 'Área de Seguros do Nu',
+                  subtitle:
+                      'Toda proteção para você e para quem você ama num só lugar',
+                  onTap: () {},
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -9,11 +9,13 @@ import '../utils/constants.dart';
 /// por alguns segundos antes de navegar para a tela de login.
 /// É a primeira impressão que o usuário tem do aplicativo.
 class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
   @override
-  _SplashScreenState createState() => _SplashScreenState();
+  SplashScreenState createState() => SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
