@@ -25,22 +25,14 @@ class LoginScreenState extends State<LoginScreen> {
   // Estado para controlar visibilidade da senha
   bool _hidePassword = true;
 
-  // Estado para controlar carregamento do botão
-  bool _isLoading = false;
-
   /// Processa o login quando o botão é pressionado
   ///
-  /// Este método valida os campos, simula uma requisição de login
-  /// e navega para a tela principal se tudo estiver correto.
-  void _handleLogin() async {
+  /// Este método valida os campos e navega para a tela principal
+  /// se tudo estiver correto.
+  void _handleLogin() {
     // Valida o formulário antes de prosseguir
     if (_formKey.currentState!.validate()) {
-      setState(() => _isLoading = true);
-
-      // Verifica se o widget ainda está montado antes de navegar
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, '/home');
-      }
+      Navigator.pushReplacementNamed(context, '/home');
     }
   }
 
@@ -199,21 +191,19 @@ class LoginScreenState extends State<LoginScreen> {
       width: double.infinity,
       height: 50,
       child: ElevatedButton(
-        onPressed: _isLoading ? null : _handleLogin,
+        onPressed: _handleLogin,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppConstants.primaryPurple,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
-        child: _isLoading
-            ? CircularProgressIndicator(color: Colors.white)
-            : Text(
-                'Entrar',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
+        child: Text(
+          'Entrar',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
       ),
     );
   }

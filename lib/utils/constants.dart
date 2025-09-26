@@ -24,7 +24,6 @@ class AppConstants {
 
   // ===== DURAÇÕES =====
   static const int splashDurationSeconds = 3;
-  static const Duration animationDuration = Duration(milliseconds: 300);
 
   // ===== TEXTOS =====
   static const String appName = 'Nubank Clone';
