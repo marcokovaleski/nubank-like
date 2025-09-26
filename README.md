@@ -378,7 +378,7 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 **⭐ Se este projeto te ajudou, considere dar uma estrela! ⭐**
 
-[![GitHub stars](https://img.shields.io/github/stars/seu-usuario/nubank_like?style=social)](https://github.com/seu-usuario/nubank_like/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/seu-usuario/nubank_like?style=social)](https://github.com/seu-usuario/nubank_like/network)
+[![GitHub stars](https://img.shields.io/github/stars/marcokovaleski/nubank_like?style=social)](https://github.com/marcokovaleski/nubank_like/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/marcokovaleski/nubank_like?style=social)](https://github.com/marcokovaleski/nubank_like/network)
 
 </div>
